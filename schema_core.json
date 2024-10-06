@@ -1,0 +1,46 @@
+{
+    "info": {
+        "version": "1.0.0",
+        "title": "Prisma Cms Core",
+        "description": "core plugin",
+        "slug": "prisma-cms-core",
+        "type": "core"
+    },
+    "collections": {
+        "user": {
+            "fields": {
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "post": {
+            "fields": {
+                "title": {
+                    "type": "string",
+                    "required": true,
+                    "unique": true,
+                    "default": "Untitled"
+                },
+                "content": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "relations": [
+        {
+            "source_entity": "user",
+            "source_field": "posts",
+            "target_entity": "post",
+            "target_field": "user",
+            "type": "one-to-many"
+        }
+    ]
+}

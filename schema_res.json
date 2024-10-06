@@ -1,0 +1,47 @@
+{
+    "info": { "version": "1.0.0", "title": "Result_schema", "slug": "result", "type": "core" },
+    "collections": {
+        "user": {
+            "fields": {
+                "name": { "type": "string" },
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+            }
+        },
+        "post": { "fields": { "title": { "type": "string" }, "content": { "type": "string" } } },
+        "product": {
+            "fields": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "rating": { "type": "int" }
+            }
+        },
+        "product_category": {
+            "fields": { "name": { "type": "string" }, "description": { "type": "string" } }
+        }
+    },
+    "relations": [
+        {
+            "source_entity": "user",
+            "source_field": "posts",
+            "target_entity": "post",
+            "target_field": "user",
+            "type": "one-to-many"
+        },
+        {
+            "source_entity": "user",
+            "source_field": "products",
+            "target_entity": "product",
+            "target_field": "user",
+            "type": "one-to-many"
+        },
+        {
+            "source_entity": "product",
+            "source_field": "category",
+            "target_entity": "product_category",
+            "target_field": "products",
+            "type": "one-to-many"
+        }
+    ],
+    "extends": {}
+}

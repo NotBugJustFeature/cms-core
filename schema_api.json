@@ -1,0 +1,28 @@
+{
+    "info": {
+        "version": "1.0.0",
+        "title": "Prisma Cms api",
+        "description": "core plugin",
+        "slug": "prisma-cms-api",
+        "type": "api"
+    },
+    "collections": {},
+    "relations": [
+        {
+            "source_entity": "user",
+            "source_field": "products",
+            "target_entity": "product",
+            "target_field": "user",
+            "type": "one-to-many"
+        }
+    ],
+    "extends": {
+        "product": {
+            "fields": {
+                "rating": {
+                    "type": "int"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "info": {
+        "version": "1.0.0",
+        "title": "Web shop",
+        "description": "Basic web shop plugin",
+        "slug": "webshop",
+        "type": "plugin"
+    },
+    "collections": {
+        "product": {
+            "fields": {
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
+        "product_category": {
+            "fields": {
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "relations": [
+        {
+            "source_entity": "product",
+            "source_field": "category",
+            "target_entity": "product_category",
+            "target_field": "products",
+            "type": "one-to-many"
+        }
+    ]
+}
