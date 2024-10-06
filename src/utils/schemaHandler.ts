@@ -140,7 +140,7 @@ export function generateSchema(schema: SchemaJson): void {
         let model = `model ${collection} {\n`
 
         Object.keys(fields).forEach((field) => {
-            console.log(collection, field)
+            // console.log(collection, field)
             model += buildField(field, fields[field]) + '\n'
         })
 
@@ -149,8 +149,19 @@ export function generateSchema(schema: SchemaJson): void {
         //     model += buildField(field, fields[field]) + '\n'
         // })
         schema.relations.forEach((field) => {
-            // if (field.source_entity === collection) {
-            // }
+            console.log(collection, field.source_entity, field.target_entity, field.type)
+            if (field.source_entity === collection) {
+                if (field.type === 'many-to-many') {
+                    model += `  ${field.source_field} ${field.target_entity}[]\n`
+                } else {
+                    model += `  ${field.source_field} ${field.target_entity}\n`
+                }
+            } else if (field.target_entity === collection) {
+                if (field.type === 'many-to-many') {
+                    model += `  ${field.target_field} ${field.source_entity}[]\n`
+                } else {
+                }
+            }
             // console.log(field)
         })
 

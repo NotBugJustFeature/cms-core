@@ -34,7 +34,7 @@
             "source_field": "category",
             "target_entity": "product_category",
             "target_field": "products",
-            "type": "one-to-many"
+            "type": "many-to-many"
         }
     ]
 }
