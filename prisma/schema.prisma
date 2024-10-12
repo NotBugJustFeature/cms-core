@@ -8,20 +8,19 @@ generator client {
 }
 
 // generated fields
-
 model User {
   id Int @id @default(autoincrement())
   name String? 
   email String? 
   password String? 
-  posts Post?
+  posts Post[]
 }
 
 model Post {
   id Int @id @default(autoincrement())
   title String @unique @default("1") 
   content String? 
-  ownerId Int @unique
+  ownerId Int
   owner User @relation(fields: [ownerId], references: [id])
 }
 

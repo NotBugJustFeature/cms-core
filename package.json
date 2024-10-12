@@ -9,8 +9,10 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
+        "@hono/node-server": "^1.13.2",
         "@prisma/client": "^5.20.0",
         "cli-color": "^2.0.4",
+        "hono": "^4.6.4",
         "pluralize": "^8.0.0",
         "prisma": "^5.20.0",
         "zod": "^3.23.8"

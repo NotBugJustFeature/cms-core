@@ -27,6 +27,15 @@ export const ZodEntityFieldValidator = z.object({
     unique: z.boolean().optional()
 })
 
+// TODO: Add info parameter to schema(default value in admin ui) and fields(plugin data) etc..
+// like this:
+// "info": {
+//     "relation": [1],
+//     "default_field": "title",
+//     "from": "core",
+//     "plugin": {}
+// }
+
 export const ZodSchemaValidator = z.object({
     info: z.object({
         version: z.string(),

@@ -150,7 +150,7 @@ export function generateSchema(schema: SchemaJson): String {
         //     model += buildField(field, fields[field]) + '\n'
         // })
         schema.relations.forEach((field) => {
-            console.log(collection, field.source_entity, field.target_entity, field.type)
+            //console.log(collection, field.source_entity, field.target_entity, field.type)
             if (field.source_entity === collection) {
                 if (field.type === 'many-to-many' || field.type === 'one-to-many') {
                     model += `  ${field.source_field} ${field.target_entity}[]\n`
@@ -175,7 +175,7 @@ export function generateSchema(schema: SchemaJson): String {
         model += `}`
         output += model + '\n\n'
     })
-    console.log(output)
+    // console.log(output)
     return output
 }
 export function buildField(name: string, field: EntityFieldType): string {
@@ -194,11 +194,6 @@ function generateDefaultValue(field: EntityFieldType): string {
         return `"${field.default}"`
     }
     if (['Boolean', 'Int', 'Float', 'DateTime'].includes(field.type)) {
-        //     field.type === 'Boolean' ||
-        //     field.type === 'Int' ||
-        //     field.type === 'Float' ||
-        //     field.type === 'DateTime'
-        // ) {
         return `${field.default}`
     }
     return ''

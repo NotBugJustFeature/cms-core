@@ -40,7 +40,7 @@
             "source_field": "posts",
             "target_entity": "Post",
             "target_field": "owner",
-            "type": "one-to-one"
+            "type": "one-to-many"
         }
     ]
 }

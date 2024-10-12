@@ -8,7 +8,15 @@
                 "password": { "type": "String" }
             }
         },
-        "post": { "fields": { "title": { "type": "String" }, "content": { "type": "String" } } },
+        "post": {
+            "fields": { "title": { "type": "String" }, "content": { "type": "String" } },
+            "info": {
+                "relation": [1],
+                "default_field": "title",
+                "from": "core",
+                "plugin": {}
+            }
+        },
         "product": {
             "fields": {
                 "name": { "type": "String" },
