@@ -1,0 +1,10 @@
+datasource db1 {
+  provider = "sqlite"
+  url      = env("DATABASE_URL_1")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// generated fields

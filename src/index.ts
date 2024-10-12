@@ -45,7 +45,11 @@ function main() {
     // fs.writeFileSync('schema_res.json', JSON.stringify(result_schema))
     console.log()
     console.log()
-    generateSchema(result_schema)
+    const generatedResult = generateSchema(result_schema)
+    const prismaTemplate =
+        fs.readFileSync('prisma/schema.template.prisma', 'utf8') + '\n\n' + generatedResult
+    console.log(prismaTemplate)
+    fs.writeFileSync('prisma/schema.prisma', prismaTemplate)
 }
 main()
 

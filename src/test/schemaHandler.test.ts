@@ -29,21 +29,63 @@ let data: SchemaJson = {
     extends: {}
 }
 
-const one2one = `
-model First {
-  id int @id @default(autoincrement())
-  name String
-  second Second
+const one2one = `model First {
+  id Int @id @default(autoincrement())
+  name String? 
+  second Second?
 }
 
 model Second {
-  id int @id @default(autoincrement())
-  name String
-  firstId Int
-  first? First @relation(fields: [firstId], references: [id])
-}`
+  id Int @id @default(autoincrement())
+  name String? 
+  firstId Int @unique
+  first First @relation(fields: [firstId], references: [id])
+}
 
-describe('one-to-one relation', () => {
+`
+const one2many = `model First {
+  id Int @id @default(autoincrement())
+  name String? 
+  second Second[]
+}
+
+model Second {
+  id Int @id @default(autoincrement())
+  name String? 
+  firstId Int
+  first First @relation(fields: [firstId], references: [id])
+}
+
+`
+
+const many2one = `model First {
+  id Int @id @default(autoincrement())
+  name String? 
+  secondId Int
+  second Second @relation(fields: [secondId], references: [id])
+}
+
+model Second {
+  id Int @id @default(autoincrement())
+  name String? 
+  first First[]
+}
+
+`
+const many2many = `model First {
+  id Int @id @default(autoincrement())
+  name String? 
+  second Second[]
+}
+
+model Second {
+  id Int @id @default(autoincrement())
+  name String? 
+  first First[]
+}
+
+`
+describe('Relations', () => {
     data.relations = [
         {
             source_entity: 'First',
@@ -53,19 +95,20 @@ describe('one-to-one relation', () => {
             type: 'one-to-one'
         }
     ]
-
-    return expect(generateSchema(data)).toBe(
-        'model first {\n  name String\n  secondId Int\n  second? @relation(fields: [secondId], references: [id])\n}\n\nmodel second {\n  name String\n  firstId Int\n  first? @relation(fields: [firstId], references: [id])\n}'
-        // `
-        //   name String
-        //   second? @relation(fields: [secondId], references: [id])
-        //   secondId Int @unique
-        // }
-
-        // model second {
-        //   name String
-        //   first? @relation(fields: [firstId], references: [id])
-        //   firstId Int @unique
-        // }`
-    )
+    test('one-to-one', () => {
+        data.relations[0].type = 'one-to-one'
+        expect(generateSchema(data)).toBe(one2one)
+    })
+    test('one-to-many', () => {
+        data.relations[0].type = 'one-to-many'
+        expect(generateSchema(data)).toBe(one2many)
+    })
+    test('many-to-one', () => {
+        data.relations[0].type = 'many-to-one'
+        expect(generateSchema(data)).toBe(many2one)
+    })
+    test('many-to-many', () => {
+        data.relations[0].type = 'many-to-many'
+        expect(generateSchema(data)).toBe(many2many)
+    })
 })

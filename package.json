@@ -9,6 +9,7 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
+        "@prisma/client": "^5.20.0",
         "cli-color": "^2.0.4",
         "pluralize": "^8.0.0",
         "prisma": "^5.20.0",

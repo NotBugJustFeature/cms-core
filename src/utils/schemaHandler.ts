@@ -155,16 +155,18 @@ export function generateSchema(schema: SchemaJson): String {
                 if (field.type === 'many-to-many' || field.type === 'one-to-many') {
                     model += `  ${field.source_field} ${field.target_entity}[]\n`
                 } else if (field.type === 'many-to-one') {
-                    model += `  ${field.source_field}Id int @unique\n`
+                    model += `  ${field.source_field}Id Int\n`
                     model += `  ${field.source_field} ${field.target_entity} @relation(fields: [${field.source_field}Id], references: [id])\n`
                 } else if (field.type === 'one-to-one') {
-                    model += `  ${field.source_field} ${field.target_entity}\n`
+                    model += `  ${field.source_field} ${field.target_entity}?\n`
                 }
             } else if (field.target_entity === collection) {
                 if (field.type === 'many-to-many' || field.type === 'many-to-one') {
                     model += `  ${field.target_field} ${field.source_entity}[]\n`
                 } else if (field.type === 'one-to-many' || field.type === 'one-to-one') {
-                    model += `  ${field.target_field}Id Int @unique\n`
+                    model += `  ${field.target_field}Id Int${
+                        field.type === 'one-to-one' ? ' @unique' : ''
+                    }\n`
                     model += `  ${field.target_field} ${field.source_entity} @relation(fields: [${field.target_field}Id], references: [id])\n`
                 }
             }
@@ -183,11 +185,24 @@ export function buildField(name: string, field: EntityFieldType): string {
     !field.required && (output += '?')
     output += ' '
     field.unique && (output += '@unique ')
-    field.default && (output += `@default(${field.default}) `)
+    field.default && (output += `@default(${generateDefaultValue(field)}) `)
 
     return output
 }
-
+function generateDefaultValue(field: EntityFieldType): string {
+    if (field.type === 'String') {
+        return `"${field.default}"`
+    }
+    if (['Boolean', 'Int', 'Float', 'DateTime'].includes(field.type)) {
+        //     field.type === 'Boolean' ||
+        //     field.type === 'Int' ||
+        //     field.type === 'Float' ||
+        //     field.type === 'DateTime'
+        // ) {
+        return `${field.default}`
+    }
+    return ''
+}
 function capitalizeFirstLetter(string: string): string {
     return string.charAt(0).toUpperCase() + string.slice(1)
 }

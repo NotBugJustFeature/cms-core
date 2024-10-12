@@ -1,24 +1,27 @@
 datasource db1 {
-  provider = "postgresql"
-  url      = env("DATABASE_URL_1")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  Int?
-}
+// generated fields
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+  id Int @id @default(autoincrement())
+  name String? 
+  email String? 
+  password String? 
+  posts Post?
 }
+
+model Post {
+  id Int @id @default(autoincrement())
+  title String @unique @default("1") 
+  content String? 
+  ownerId Int @unique
+  owner User @relation(fields: [ownerId], references: [id])
+}
+
