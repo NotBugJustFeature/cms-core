@@ -3,21 +3,21 @@
     "collections": {
         "user": {
             "fields": {
-                "name": { "type": "string" },
-                "email": { "type": "string" },
-                "password": { "type": "string" }
+                "name": { "type": "String" },
+                "email": { "type": "String" },
+                "password": { "type": "String" }
             }
         },
-        "post": { "fields": { "title": { "type": "string" }, "content": { "type": "string" } } },
+        "post": { "fields": { "title": { "type": "String" }, "content": { "type": "String" } } },
         "product": {
             "fields": {
-                "name": { "type": "string" },
-                "description": { "type": "string" },
-                "rating": { "type": "int" }
+                "name": { "type": "String" },
+                "description": { "type": "String" },
+                "rating": { "type": "Int" }
             }
         },
         "product_category": {
-            "fields": { "name": { "type": "string" }, "description": { "type": "string" } }
+            "fields": { "name": { "type": "String" }, "description": { "type": "String" } }
         }
     },
     "relations": [

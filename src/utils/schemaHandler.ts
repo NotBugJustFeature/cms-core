@@ -133,11 +133,12 @@ export function mergeSchemas(schemas: SchemaJson[]): SchemaJson {
 
     return result as SchemaJson
 }
-export function generateSchema(schema: SchemaJson): void {
+export function generateSchema(schema: SchemaJson): String {
     let output = ''
     Object.keys(schema.collections).forEach((collection: string) => {
         const fields = schema.collections[collection].fields
         let model = `model ${collection} {\n`
+        model += '  id Int @id @default(autoincrement())\n'
 
         Object.keys(fields).forEach((field) => {
             // console.log(collection, field)
@@ -151,29 +152,34 @@ export function generateSchema(schema: SchemaJson): void {
         schema.relations.forEach((field) => {
             console.log(collection, field.source_entity, field.target_entity, field.type)
             if (field.source_entity === collection) {
-                if (field.type === 'many-to-many') {
+                if (field.type === 'many-to-many' || field.type === 'one-to-many') {
                     model += `  ${field.source_field} ${field.target_entity}[]\n`
-                } else {
+                } else if (field.type === 'many-to-one') {
+                    model += `  ${field.source_field}Id int @unique\n`
+                    model += `  ${field.source_field} ${field.target_entity} @relation(fields: [${field.source_field}Id], references: [id])\n`
+                } else if (field.type === 'one-to-one') {
                     model += `  ${field.source_field} ${field.target_entity}\n`
                 }
             } else if (field.target_entity === collection) {
-                if (field.type === 'many-to-many') {
+                if (field.type === 'many-to-many' || field.type === 'many-to-one') {
                     model += `  ${field.target_field} ${field.source_entity}[]\n`
-                } else {
+                } else if (field.type === 'one-to-many' || field.type === 'one-to-one') {
+                    model += `  ${field.target_field}Id Int @unique\n`
+                    model += `  ${field.target_field} ${field.source_entity} @relation(fields: [${field.target_field}Id], references: [id])\n`
                 }
             }
-            // console.log(field)
         })
 
         model += `}`
         output += model + '\n\n'
     })
     console.log(output)
+    return output
 }
 export function buildField(name: string, field: EntityFieldType): string {
     let output = ''
 
-    output += `  ${name} ${capitalizeFirstLetter(field.type)}`
+    output += `  ${name} ${field.type}`
     !field.required && (output += '?')
     output += ' '
     field.unique && (output += '@unique ')

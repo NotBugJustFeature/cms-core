@@ -7,39 +7,39 @@
         "type": "core"
     },
     "collections": {
-        "user": {
+        "User": {
             "fields": {
                 "name": {
-                    "type": "string"
+                    "type": "String"
                 },
                 "email": {
-                    "type": "string"
+                    "type": "String"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "String"
                 }
             }
         },
-        "post": {
+        "Post": {
             "fields": {
                 "title": {
-                    "type": "string",
+                    "type": "String",
                     "required": true,
                     "unique": true,
                     "default": "Untitled"
                 },
                 "content": {
-                    "type": "string"
+                    "type": "String"
                 }
             }
         }
     },
     "relations": [
         {
-            "source_entity": "user",
+            "source_entity": "User",
             "source_field": "posts",
-            "target_entity": "post",
-            "target_field": "user",
+            "target_entity": "Post",
+            "target_field": "owner",
             "type": "one-to-many"
         }
     ]

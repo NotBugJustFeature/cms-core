@@ -10,20 +10,23 @@
         "product": {
             "fields": {
                 "name": {
-                    "type": "string"
+                    "type": "String"
                 },
                 "description": {
-                    "type": "string"
+                    "type": "String"
+                },
+                "release_date": {
+                    "type": "DateTime"
                 }
             }
         },
         "product_category": {
             "fields": {
                 "name": {
-                    "type": "string"
+                    "type": "String"
                 },
                 "description": {
-                    "type": "string"
+                    "type": "String"
                 }
             }
         }

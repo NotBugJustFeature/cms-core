@@ -1,14 +1,15 @@
 import { z } from 'zod'
 // import { PrimitiveFieldType } from '../types'
 
-export const ZodPrimitiveFieldValidator = z.enum(['string', 'int', 'boolean'])
+export const ZodPrimitiveFieldValidator = z.enum(['Boolean', 'Int', 'Float', 'String', 'DateTime'])
+export const ZodSchemaInfoEnum = z.enum(['plugin', 'core', 'api'])
+
 export const ZodRelationTypeValidator = z.enum([
     'one-to-one',
     'one-to-many',
     'many-to-one',
     'many-to-many'
 ])
-export const ZodSchemaInfoEnum = z.enum(['plugin', 'core', 'api'])
 
 export const ZodRelationValidator = z.object({
     source_entity: z.string(),
@@ -20,6 +21,7 @@ export const ZodRelationValidator = z.object({
 
 export const ZodEntityFieldValidator = z.object({
     type: ZodPrimitiveFieldValidator,
+    displayName: z.string().optional(),
     required: z.boolean().optional(),
     default: z.string().optional(),
     unique: z.boolean().optional()

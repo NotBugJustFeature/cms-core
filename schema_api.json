@@ -20,7 +20,7 @@
         "product": {
             "fields": {
                 "rating": {
-                    "type": "int"
+                    "type": "Int"
                 }
             }
         }

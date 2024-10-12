@@ -15,8 +15,8 @@ function main() {
 
     let schemas: SchemaJson[] = []
     schemas.push(loadSchema('schema_core.json'))
-    schemas.push(loadSchema('schema_api.json'))
-    schemas.push(loadSchema('schema_webshop.json'))
+    // schemas.push(loadSchema('schema_api.json'))
+    // schemas.push(loadSchema('schema_webshop.json'))
 
     console.log(okColor('Schema loading done'))
 
@@ -43,7 +43,8 @@ function main() {
     }
 
     // fs.writeFileSync('schema_res.json', JSON.stringify(result_schema))
-
+    console.log()
+    console.log()
     generateSchema(result_schema)
 }
 main()
