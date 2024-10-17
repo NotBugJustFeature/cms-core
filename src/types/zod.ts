@@ -21,20 +21,24 @@ export const ZodRelationValidator = z.object({
 
 export const ZodEntityFieldValidator = z.object({
     type: ZodPrimitiveFieldValidator,
-    displayName: z.string().optional(),
     required: z.boolean().optional(),
     default: z.string().optional(),
-    unique: z.boolean().optional()
+    unique: z.boolean().optional(),
+    displayName: z.string().optional(),
+    order: z.number().optional()
 })
 
 // TODO: Add info parameter to schema(default value in admin ui) and fields(plugin data) etc..
 // like this:
 // "info": {
 //     "relation": [1],
-//     "default_field": "title",
+//     "defaultField": "title",
 //     "from": "core",
-//     "plugin": {}
-// }
+//     "plugin": {},
+// },
+//     "generatedInfo": {
+//         "relation": [1],
+//}
 
 export const ZodSchemaValidator = z.object({
     info: z.object({

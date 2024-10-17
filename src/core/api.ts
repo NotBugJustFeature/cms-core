@@ -36,9 +36,10 @@ apiApp.get('/:collection', async (context) => {
             include: relations2[collection]
         })
     )
-    prisma.user.findMany({
-        include: {
-            posts: true
-        }
-    })
 })
+
+// get - read all - done
+// TODO get/{id} - read one
+// TODO post - create
+// TODO put/{id} - update
+// TODO delete/{id} - delete
