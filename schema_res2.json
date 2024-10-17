@@ -1,0 +1,55 @@
+{
+    "info": { "version": "1.0.0", "title": "Result_schema", "slug": "result", "type": "core" },
+    "collections": {
+        "user": {
+            "fields": {
+                "name": { "type": "String" },
+                "email": { "type": "String" },
+                "password": { "type": "String" }
+            }
+        },
+        "post": {
+            "fields": { "title": { "type": "String" }, "content": { "type": "String" } },
+            "info": {
+                "relation": [1],
+                "default_field": "title",
+                "from": "core",
+                "plugin": {}
+            }
+        },
+        "product": {
+            "fields": {
+                "name": { "type": "String" },
+                "description": { "type": "String" },
+                "rating": { "type": "Int" }
+            }
+        },
+        "product_category": {
+            "fields": { "name": { "type": "String" }, "description": { "type": "String" } }
+        }
+    },
+    "relations": [
+        {
+            "source_entity": "user",
+            "source_field": "posts",
+            "target_entity": "post",
+            "target_field": "user",
+            "type": "one-to-many"
+        },
+        {
+            "source_entity": "user",
+            "source_field": "products",
+            "target_entity": "product",
+            "target_field": "user",
+            "type": "one-to-many"
+        },
+        {
+            "source_entity": "product",
+            "source_field": "category",
+            "target_entity": "product_category",
+            "target_field": "products",
+            "type": "many-to-many"
+        }
+    ],
+    "extends": {}
+}

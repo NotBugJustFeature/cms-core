@@ -42,7 +42,7 @@ function main() {
         console.log(okColor('Schema merge validation done'))
     }
 
-    // fs.writeFileSync('schema_res.json', JSON.stringify(result_schema))
+    fs.writeFileSync('schema_res.json', JSON.stringify(result_schema))
     // console.log()
     // console.log()
     const generatedResult = generateSchema(result_schema)

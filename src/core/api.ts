@@ -13,15 +13,15 @@ schema.relations.forEach((field) => {
     if (!Object.keys(relations).includes(field.target_entity)) {
         relations[field.target_entity] = []
     }
-    relations[field.source_entity].push(field.target_entity)
-    relations[field.target_entity].push(field.source_entity)
+    relations[field.source_entity].push(field.source_field)
+    relations[field.target_entity].push(field.target_field)
 })
-// let relations2: Record<string, Record<string, boolean>> = {}
-// Object.keys(relations).forEach((key) => {
-
-//     relations[key].forEach((item) => relations[key][key2] = true)
-
-// console.log('relations', relations)
+let relations2: Record<string, Record<string, boolean>> = {}
+Object.keys(relations).forEach((key) => {
+    relations2[key] = {}
+    relations[key].forEach((item) => (relations2[key][item] = true))
+})
+console.log('relations', relations, relations2)
 
 export const apiApp = new Hono()
 
@@ -32,10 +32,13 @@ apiApp.get('/:collection', async (context) => {
     }
     return context.json(
         //@ts-ignore
-        await prisma[collection].findMany({
-            // include: {
-            //     posts: true
-            // }
+        await prisma[collection.toLowerCase()].findMany({
+            include: relations2[collection]
         })
     )
+    prisma.user.findMany({
+        include: {
+            posts: true
+        }
+    })
 })
