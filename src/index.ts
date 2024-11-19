@@ -8,13 +8,13 @@ import {
     validateSchemaRelations
 } from './utils/schemaHandler'
 import { errorBoldColor, okColor } from './utils/utils'
-import fs, { write } from 'fs'
+import fs, { write } from 'node:fs'
 
-function main() {
+export function main() {
     console.log(okColor('Schema loading init...'))
 
     let schemas: SchemaJson[] = []
-    schemas.push(loadSchema('schema_core.json'))
+    schemas.push(loadSchema(__dirname + '/../schema_core.json'))
     // schemas.push(loadSchema('schema_api.json'))
     // schemas.push(loadSchema('schema_webshop.json'))
 
@@ -46,17 +46,22 @@ function main() {
     // console.log()
     // console.log()
     const generatedResult = generateSchema(result_schema)
-    let [result, err] = sync(fs.readFileSync('prisma/schema.template.prisma', 'utf8'))
+    let [result, err] = sync(
+        fs.readFileSync(__dirname + '/../' + 'prisma/schema.template.prisma', 'utf8')
+    )
     if (result == null) {
         throw new Error("Can't read prisma template")
     }
 
     let [writeResult, writeErr] = sync(
-        fs.writeFileSync('prisma/schema.prisma', result + '\n' + generatedResult)
+        fs.writeFileSync(
+            __dirname + '/../' + 'prisma/schema.prisma',
+            result + '\n' + generatedResult
+        )
     )
     if (writeErr != null) {
         throw new Error("Can't write prisma schema")
     }
     return
 }
-main()
+//main()

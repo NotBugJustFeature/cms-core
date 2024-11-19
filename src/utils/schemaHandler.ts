@@ -85,7 +85,12 @@ export function printDetailedZodErrors(
 }
 
 export function loadSchema(path: string): SchemaJson {
-    const schemaString = fs.readFileSync(path, 'utf8')
+    console.log(fs.existsSync(path), process.cwd(), __dirname)
+
+    const [schemaString, err1] = sync<string>(fs.readFileSync(path, 'utf8'))
+    if (err1) {
+        throw new Error('Schema file not found: ' + path)
+    }
     const [result, err] = sync<SchemaJson>(JSON.parse(schemaString))
     if (err) {
         throw new Error('Invalid schema: ' + path + '\n' + err)
