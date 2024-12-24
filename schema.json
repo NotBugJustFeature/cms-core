@@ -7,7 +7,7 @@
         "type": "core"
     },
     "collections": {
-        "UserTest": {
+        "User": {
             "fields": {
                 "name": {
                     "type": "Text"
@@ -41,7 +41,7 @@
     },
     "relations": [
         {
-            "source_entity": "UserTest",
+            "source_entity": "User",
             "source_field": "posts",
             "target_entity": "Post",
             "target_field": "owner",
