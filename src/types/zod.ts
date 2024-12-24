@@ -40,7 +40,6 @@ export const ZodCmsConfigValidator = z.object({
     plugins: z.array(z.object({ path: z.string(), enabled: z.boolean() }))
 })
 
-// TODO: Add info parameter to schema(default value in admin ui) and fields(plugin data) etc..
 // like this:
 // "info": {
 //     "relation": [1],
