@@ -28,6 +28,11 @@ export const ZodEntityFieldValidator = z.object({
     order: z.number().optional()
 })
 
+export const ZodCmsConfigValidator = z.object({
+    basepath: z.string(),
+    plugins: z.array(z.object({ path: z.string(), enabled: z.boolean() }))
+})
+
 // TODO: Add info parameter to schema(default value in admin ui) and fields(plugin data) etc..
 // like this:
 // "info": {
@@ -62,3 +67,4 @@ export type EntityFieldType = z.infer<typeof ZodEntityFieldValidator>
 export type SchemaInfo = z.infer<typeof ZodSchemaInfoEnum>
 export type RelationType = z.infer<typeof ZodRelationTypeValidator>
 export type Relation = z.infer<typeof ZodRelationValidator>
+export type CmsConfig = z.infer<typeof ZodCmsConfigValidator>

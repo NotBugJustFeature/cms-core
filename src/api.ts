@@ -1,7 +1,8 @@
 import { Hono } from 'hono'
-import { prisma } from '../../../cms-test/src/prisma'
-import { loadSchema } from '../utils/schemaHandler'
-import { SchemaJson } from '../types/zod'
+import { prisma } from './prisma'
+import { Prisma } from '@prisma/client'
+import { loadSchema } from './utils/schemaHandler'
+import { SchemaJson } from './types/zod'
 
 let schema: SchemaJson = loadSchema('schema_res.json')
 let relations: Record<string, string[]> = {}

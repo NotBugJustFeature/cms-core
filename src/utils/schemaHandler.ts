@@ -85,13 +85,15 @@ export function printDetailedZodErrors(
 }
 
 export function loadSchema(path: string): SchemaJson {
-    console.log(fs.existsSync(path), process.cwd(), __dirname)
+    // console.log(fs.existsSync(path), process.cwd(), __dirname)
 
-    const [schemaString, err1] = sync<string>(fs.readFileSync(path, 'utf8'))
+    const [schemaString, err1] = sync<string>(() =>
+        fs.readFileSync(process.cwd() + '/' + path, 'utf8')
+    )
     if (err1) {
         throw new Error('Schema file not found: ' + path)
     }
-    const [result, err] = sync<SchemaJson>(JSON.parse(schemaString))
+    const [result, err] = sync<SchemaJson>(() => JSON.parse(schemaString))
     if (err) {
         throw new Error('Invalid schema: ' + path + '\n' + err)
     }
@@ -138,6 +140,7 @@ export function mergeSchemas(schemas: SchemaJson[]): SchemaJson {
 
     return result as SchemaJson
 }
+
 export function generateSchema(schema: SchemaJson): String {
     let output = ''
     Object.keys(schema.collections).forEach((collection: string) => {
