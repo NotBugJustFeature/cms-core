@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
-import { prisma } from './prisma'
-import { Prisma } from '@prisma/client'
+import { prisma } from '../../../cms-test/src/prisma'
 import { loadSchema } from '../utils/schemaHandler'
 import { SchemaJson } from '../types/zod'
 

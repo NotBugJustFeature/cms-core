@@ -54,10 +54,7 @@ export function main() {
     }
 
     let [writeResult, writeErr] = sync(
-        fs.writeFileSync(
-            __dirname + '/../' + 'prisma/schema.prisma',
-            result + '\n' + generatedResult
-        )
+        fs.writeFileSync('prisma/schema.prisma', result + '\n' + generatedResult)
     )
     if (writeErr != null) {
         throw new Error("Can't write prisma schema")
