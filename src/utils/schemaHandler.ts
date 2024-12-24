@@ -97,7 +97,26 @@ export function loadSchema(path: string): SchemaJson {
     if (err) {
         throw new Error('Invalid schema: ' + path + '\n' + err)
     }
+
+    Object.keys(result.collections).forEach((collection: string) => {
+        let name: string = convertSchemaName(collection)
+        result.collections[name] = result.collections[collection]
+        delete result.collections[collection]
+    })
+
+    result.relations.forEach((relation) => {
+        relation.source_entity = convertSchemaName(relation.source_entity)
+        relation.target_entity = convertSchemaName(relation.target_entity)
+        // result.collections[name] = result.collections[collection]
+        // delete result.collections[collection]
+    })
+
     return result
+}
+
+function convertSchemaName(variableName: string): string {
+    if (!variableName) return variableName // Handle empty input
+    return variableName.charAt(0).toLowerCase() + variableName.slice(1)
 }
 
 export function mergeSchemas(schemas: SchemaJson[]): SchemaJson {
@@ -186,10 +205,44 @@ export function generateSchema(schema: SchemaJson): String {
     // console.log(output)
     return output
 }
+
+export function setGeneratedInfo(schema: SchemaJson) {
+    let relations: Record<string, string[]> = {}
+    schema.relations.forEach((field) => {
+        if (!Object.keys(relations).includes(field.source_entity)) {
+            relations[field.source_entity] = []
+        }
+        if (!Object.keys(relations).includes(field.target_entity)) {
+            relations[field.target_entity] = []
+        }
+        relations[field.source_entity].push(field.source_field)
+        relations[field.target_entity].push(field.target_field)
+    })
+    let relations2: Record<string, Record<string, boolean>> = {}
+    Object.keys(relations).forEach((key) => {
+        relations2[key] = {}
+        relations[key].forEach((item) => (relations2[key][item] = true))
+    })
+    console.log('relations', relations, relations2)
+
+    Object.keys(schema.collections).forEach((collection: string) => {
+        schema.collections[collection].generatedInfo = {
+            relations: relations2[collection] || {},
+            from: ''
+        }
+    })
+
+    Object.keys(schema.collections).forEach((collection: string) => {
+        console.log(schema.collections[collection])
+    })
+
+    return schema
+}
+
 export function buildField(name: string, field: EntityFieldType): string {
     let output = ''
 
-    output += `  ${name} ${field.type}`
+    output += `  ${name} ${getPrimitiveType(field.type)}`
     !field.required && (output += '?')
     output += ' '
     field.unique && (output += '@unique ')
@@ -197,8 +250,28 @@ export function buildField(name: string, field: EntityFieldType): string {
 
     return output
 }
+
+function getPrimitiveType(type: string): string {
+    switch (type) {
+        case 'Boolean':
+            return 'Boolean'
+        case 'Int':
+            return 'Int'
+        case 'Float':
+            return 'Float'
+        case 'Text':
+            return 'String'
+        case 'Textarea':
+            return 'String'
+        case 'DateTime':
+            return 'DateTime'
+        default:
+            return 'String'
+    }
+}
+
 function generateDefaultValue(field: EntityFieldType): string {
-    if (field.type === 'String') {
+    if (field.type === 'Textarea' || field.type === 'Text') {
         return `"${field.default}"`
     }
     if (['Boolean', 'Int', 'Float', 'DateTime'].includes(field.type)) {

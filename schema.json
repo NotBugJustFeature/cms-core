@@ -7,36 +7,41 @@
         "type": "core"
     },
     "collections": {
-        "User": {
+        "UserTest": {
             "fields": {
                 "name": {
-                    "type": "String"
+                    "type": "Text"
                 },
                 "email": {
-                    "type": "String"
+                    "type": "Text"
                 },
                 "password": {
-                    "type": "String"
+                    "type": "Text"
                 }
+            },
+            "info": {
+                "defaultField": "name"
             }
         },
         "Post": {
             "fields": {
                 "title": {
-                    "type": "String",
+                    "type": "Text",
                     "required": true,
-                    "unique": true,
-                    "default": "1"
+                    "unique": true
                 },
                 "content": {
-                    "type": "String"
+                    "type": "Text"
                 }
+            },
+            "info": {
+                "defaultField": "name"
             }
         }
     },
     "relations": [
         {
-            "source_entity": "User",
+            "source_entity": "UserTest",
             "source_field": "posts",
             "target_entity": "Post",
             "target_field": "owner",

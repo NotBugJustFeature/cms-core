@@ -4,6 +4,7 @@ import {
     generateSchema,
     loadSchema,
     mergeSchemas,
+    setGeneratedInfo,
     validateSchema,
     validateSchemaRelations
 } from './utils/schemaHandler'
@@ -29,7 +30,7 @@ export function generator(config: CmsConfig) {
 
     console.log(okColor('Schema validation completed'))
 
-    const mergedSchema = mergeSchemas(schemas)
+    let mergedSchema = mergeSchemas(schemas)
     console.log(okColor('Schema merging completed'))
 
     totalErrors = validateSchemaRelations(mergedSchema, true)
@@ -39,7 +40,7 @@ export function generator(config: CmsConfig) {
     }
 
     console.log(okColor('Schema merge validation completed'))
-
+    mergedSchema = setGeneratedInfo(mergedSchema)
     fs.writeFileSync('schema_res.json', JSON.stringify(mergedSchema))
 
     const generatedSchema = generateSchema(mergedSchema)

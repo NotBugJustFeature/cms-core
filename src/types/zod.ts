@@ -1,7 +1,14 @@
 import { z } from 'zod'
 // import { PrimitiveFieldType } from '../types'
 
-export const ZodPrimitiveFieldValidator = z.enum(['Boolean', 'Int', 'Float', 'String', 'DateTime'])
+export const ZodPrimitiveFieldValidator = z.enum([
+    'Boolean',
+    'Int',
+    'Float',
+    'Text',
+    'Textarea',
+    'DateTime'
+])
 export const ZodSchemaInfoEnum = z.enum(['plugin', 'core', 'api'])
 
 export const ZodRelationTypeValidator = z.enum([
@@ -38,11 +45,11 @@ export const ZodCmsConfigValidator = z.object({
 // "info": {
 //     "relation": [1],
 //     "defaultField": "title",
-//     "from": "core",
 //     "plugin": {},
 // },
 //     "generatedInfo": {
-//         "relation": [1],
+//          "from": "core",
+//          "relation": [1],
 //}
 
 export const ZodSchemaValidator = z.object({
@@ -54,7 +61,18 @@ export const ZodSchemaValidator = z.object({
         type: ZodSchemaInfoEnum.default('plugin')
     }),
     collections: z
-        .record(z.object({ fields: z.record(ZodEntityFieldValidator) }))
+        .record(
+            z.object({
+                fields: z.record(ZodEntityFieldValidator),
+                info: z.object({ defaultField: z.string() }),
+                generatedInfo: z
+                    .object({
+                        relations: z.record(z.boolean()),
+                        from: z.string()
+                    })
+                    .optional()
+            })
+        )
 
         .default({}),
     relations: z.array(ZodRelationValidator).default([]),
