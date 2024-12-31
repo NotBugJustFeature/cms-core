@@ -5,24 +5,24 @@ import { loadSchema } from './utils/schemaHandler'
 import { SchemaJson } from './types/zod'
 
 let schema: SchemaJson = loadSchema('schema_res.json')
-let relations: Record<string, string[]> = {}
-schema.relations.forEach((field) => {
-    if (!Object.keys(relations).includes(field.source_entity)) {
-        relations[field.source_entity] = []
-    }
-    if (!Object.keys(relations).includes(field.target_entity)) {
-        relations[field.target_entity] = []
-    }
-    relations[field.source_entity].push(field.source_field)
-    relations[field.target_entity].push(field.target_field)
-})
-let relations2: Record<string, Record<string, boolean>> = {}
-Object.keys(relations).forEach((key) => {
-    relations2[key] = {}
-    relations[key].forEach((item) => (relations2[key][item] = true))
-})
-console.log('relations', relations, relations2)
-
+// let relations: Record<string, string[]> = {}
+// schema.relations.forEach((field) => {
+//     if (!Object.keys(relations).includes(field.source_entity)) {
+//         relations[field.source_entity] = []
+//     }
+//     if (!Object.keys(relations).includes(field.target_entity)) {
+//         relations[field.target_entity] = []
+//     }
+//     relations[field.source_entity].push(field.source_field)
+//     relations[field.target_entity].push(field.target_field)
+// })
+// let relations2: Record<string, Record<string, boolean>> = {}
+// Object.keys(relations).forEach((key) => {
+//     relations2[key] = {}
+//     relations[key].forEach((item) => (relations2[key][item] = true))
+// })
+// console.log('relations', relations, relations2)
+console.log(schema)
 export const apiApp = new Hono()
 
 apiApp.get('/:collection', async (context) => {
@@ -33,7 +33,7 @@ apiApp.get('/:collection', async (context) => {
     return context.json(
         //@ts-ignore
         await prisma[collection.toLowerCase()].findMany({
-            include: relations2[collection]
+            include: schema.collections[collection]?.generatedInfo?.relations
         })
     )
 })

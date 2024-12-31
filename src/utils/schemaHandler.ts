@@ -101,7 +101,7 @@ export function loadSchema(path: string): SchemaJson {
     Object.keys(result.collections).forEach((collection: string) => {
         let name: string = convertSchemaName(collection)
         result.collections[name] = result.collections[collection]
-        delete result.collections[collection]
+        if (name !== collection) delete result.collections[collection]
     })
 
     result.relations.forEach((relation) => {
@@ -110,8 +110,7 @@ export function loadSchema(path: string): SchemaJson {
         // result.collections[name] = result.collections[collection]
         // delete result.collections[collection]
     })
-
-    return result
+    return result //setGeneratedInfo(result)
 }
 
 function convertSchemaName(variableName: string): string {
@@ -206,7 +205,7 @@ export function generateSchema(schema: SchemaJson): String {
     return output
 }
 
-export function setGeneratedInfo(schema: SchemaJson) {
+export function setGeneratedInfo(schema: SchemaJson): SchemaJson {
     let relations: Record<string, string[]> = {}
     schema.relations.forEach((field) => {
         if (!Object.keys(relations).includes(field.source_entity)) {
