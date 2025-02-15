@@ -85,3 +85,17 @@ export type SchemaInfo = z.infer<typeof ZodSchemaInfoEnum>
 export type RelationType = z.infer<typeof ZodRelationTypeValidator>
 export type Relation = z.infer<typeof ZodRelationValidator>
 export type CmsConfig = z.infer<typeof ZodCmsConfigValidator>
+
+export const ZodPluginConfigValidator = z.object({
+    title: z.string(),
+    routes: z.array(
+        z.object({
+            path: z.string(),
+            name: z.string(),
+            component: z.function()
+        })
+    ),
+    schemaLocation: z.string().optional()
+})
+
+export type Config = z.infer<typeof ZodPluginConfigValidator>
