@@ -90,7 +90,7 @@ import { Icon } from '@iconify/vue'
 const isExpanded = ref(false)
 
 const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: 'mdi:view-dashboard' },
+    { name: 'Dashboard', path: '/collection', icon: 'mdi:view-dashboard' },
     { name: 'Posts', path: '/posts', icon: 'mdi:post' },
     { name: 'Media', path: '/media', icon: 'mdi:image' },
     { name: 'Users', path: '/users', icon: 'mdi:account-group' },

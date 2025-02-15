@@ -35,7 +35,7 @@
                 }
             },
             "info": {
-                "defaultField": "name"
+                "defaultField": "title"
             }
         }
     },
