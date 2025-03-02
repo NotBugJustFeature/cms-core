@@ -16,7 +16,7 @@ Object.keys(schema.collections).forEach((collection: String) => {
                 //@ts-ignore
                 (await prisma[collection].findMany({
                     //@ts-ignore
-                    include: schema.collections[collection]?.generatedInfo?.relations
+                    include: schema.collections[collection]?.generatedInfo?.selectRelations
                 })) || []
         })
     })
@@ -35,7 +35,7 @@ Object.keys(schema.collections).forEach((collection: String) => {
                         id
                     },
                     //@ts-ignore
-                    include: schema.collections[collection]?.generatedInfo?.relations
+                    include: schema.collections[collection]?.generatedInfo?.selectRelations
                 })) || {
                     error: {
                         type: 'not_found',
@@ -117,6 +117,20 @@ Object.keys(schema.collections).forEach((collection: String) => {
             )
         }
     })
+})
+
+apiApp.get('/asd', async (context) => {
+    await prisma.user.update({
+        where: {
+            id: 1
+        },
+        data: {
+            posts: {
+                set: [{ id: 1 }]
+            }
+        }
+    })
+    return context.json({})
 })
 
 // apiApp.get('/:collection', async (context) => {

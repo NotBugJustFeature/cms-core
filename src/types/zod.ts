@@ -71,7 +71,9 @@ export const ZodSchemaValidator = z.object({
                         selectRelations: z.record(z.boolean()),
                         relationData: z.array(
                             z.object({
-                                field_name: z.string(),
+                                entity_name: z.string(),
+                                target_field_name: z.string(),
+                                self_field_name: z.string(),
                                 relation_type: ZodRelationType
                             })
                         ),

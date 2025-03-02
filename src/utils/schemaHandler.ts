@@ -181,8 +181,8 @@ export function generateSchema(schema: SchemaJson): String {
                 if (field.type === 'many-to-many' || field.type === 'one-to-many') {
                     model += `  ${field.source_field} ${field.target_entity}[]\n`
                 } else if (field.type === 'many-to-one') {
-                    model += `  ${field.source_field}Id Int\n`
-                    model += `  ${field.source_field} ${field.target_entity} @relation(fields: [${field.source_field}Id], references: [id])\n`
+                    model += `  ${field.source_field}Id Int?\n`
+                    model += `  ${field.source_field} ${field.target_entity}? @relation(fields: [${field.source_field}Id], references: [id], onDelete: Cascade)\n`
                 } else if (field.type === 'one-to-one') {
                     model += `  ${field.source_field} ${field.target_entity}?\n`
                 }
@@ -190,10 +190,10 @@ export function generateSchema(schema: SchemaJson): String {
                 if (field.type === 'many-to-many' || field.type === 'many-to-one') {
                     model += `  ${field.target_field} ${field.source_entity}[]\n`
                 } else if (field.type === 'one-to-many' || field.type === 'one-to-one') {
-                    model += `  ${field.target_field}Id Int${
+                    model += `  ${field.target_field}Id Int?${
                         field.type === 'one-to-one' ? ' @unique' : ''
                     }\n`
-                    model += `  ${field.target_field} ${field.source_entity} @relation(fields: [${field.target_field}Id], references: [id])\n`
+                    model += `  ${field.target_field} ${field.source_entity}? @relation(fields: [${field.target_field}Id], references: [id], onDelete: Cascade)\n`
                 }
             }
         })
@@ -227,17 +227,29 @@ export function setGeneratedInfo(schema: SchemaJson): SchemaJson {
         reldata[field.target_entity].push(field)
     })
 
-    let relationData: Record<string, { field_name: string; relation_type: InfoRelationType }[]> = {}
+    let relationData: Record<
+        string,
+        {
+            entity_name: string
+            target_field_name: string
+            self_field_name: string
+            relation_type: InfoRelationType
+        }[]
+    > = {}
     Object.keys(reldata).forEach((entity) => {
         relationData[entity] = reldata[entity].map((relation) => {
             if (relation.source_entity === entity) {
                 return {
-                    field_name: relation.source_field,
+                    entity_name: relation.target_entity,
+                    target_field_name: relation.target_field,
+                    self_field_name: relation.source_field,
                     relation_type: relation.type.endsWith('one') ? 'one' : 'many'
                 }
             } else {
                 return {
-                    field_name: relation.target_field,
+                    entity_name: relation.source_entity,
+                    target_field_name: relation.source_field,
+                    self_field_name: relation.target_field,
                     relation_type: relation.type.startsWith('one') ? 'one' : 'many'
                 }
             }
