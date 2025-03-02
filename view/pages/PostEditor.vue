@@ -98,9 +98,15 @@ const initOptions = (relation: any) => {
 
 watch(data, (newData) => {
     console.log(newData)
-    if (newData) {
-        formData.value = { ...newData.data }
-    }
+    if (!newData) return
+    formData.value = { ...newData.data }
+    console.log(config?.schema?.collections?.[route.params.collection]?.generatedInfo.relationData)
+    config?.schema?.collections?.[route.params.collection]?.generatedInfo.relationData.forEach(
+        (relation) => {
+            console.log(relation)
+        }
+    )
+    // TODO make to can save the data
 })
 
 const handleSubmit = () => {
