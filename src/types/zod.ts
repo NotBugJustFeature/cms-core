@@ -51,6 +51,8 @@ export const ZodCmsConfigValidator = z.object({
 //          "relation": [1],
 //}
 
+export const ZodRelationType = z.enum(['one', 'many'])
+
 export const ZodSchemaValidator = z.object({
     info: z.object({
         version: z.string(),
@@ -66,7 +68,13 @@ export const ZodSchemaValidator = z.object({
                 info: z.object({ defaultField: z.string() }),
                 generatedInfo: z
                     .object({
-                        relations: z.record(z.boolean()),
+                        selectRelations: z.record(z.boolean()),
+                        relationData: z.array(
+                            z.object({
+                                field_name: z.string(),
+                                relation_type: ZodRelationType
+                            })
+                        ),
                         from: z.string()
                     })
                     .optional()
@@ -85,6 +93,7 @@ export type SchemaInfo = z.infer<typeof ZodSchemaInfoEnum>
 export type RelationType = z.infer<typeof ZodRelationTypeValidator>
 export type Relation = z.infer<typeof ZodRelationValidator>
 export type CmsConfig = z.infer<typeof ZodCmsConfigValidator>
+export type InfoRelationType = z.infer<typeof ZodRelationType>
 
 export const ZodPluginConfigValidator = z.object({
     title: z.string(),

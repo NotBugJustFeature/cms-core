@@ -1,6 +1,6 @@
 import { Relation, SchemaJson } from '../types/zod'
 import { sync } from '../types'
-import { ZodSchemaValidator, EntityFieldType } from '../types/zod'
+import { ZodSchemaValidator, EntityFieldType, InfoRelationType } from '../types/zod'
 import fs from 'fs'
 import { errorColor, errorBoldColor } from './utils'
 
@@ -207,7 +207,14 @@ export function generateSchema(schema: SchemaJson): String {
 
 export function setGeneratedInfo(schema: SchemaJson): SchemaJson {
     let relations: Record<string, string[]> = {}
+    let reldata: Record<string, Relation[]> = {}
     schema.relations.forEach((field) => {
+        if (!Object.keys(reldata).includes(field.source_entity)) {
+            reldata[field.source_entity] = []
+        }
+        if (!Object.keys(reldata).includes(field.target_entity)) {
+            reldata[field.target_entity] = []
+        }
         if (!Object.keys(relations).includes(field.source_entity)) {
             relations[field.source_entity] = []
         }
@@ -216,7 +223,29 @@ export function setGeneratedInfo(schema: SchemaJson): SchemaJson {
         }
         relations[field.source_entity].push(field.source_field)
         relations[field.target_entity].push(field.target_field)
+        reldata[field.source_entity].push(field)
+        reldata[field.target_entity].push(field)
     })
+
+    let relationData: Record<string, { field_name: string; relation_type: InfoRelationType }[]> = {}
+    Object.keys(reldata).forEach((entity) => {
+        relationData[entity] = reldata[entity].map((relation) => {
+            if (relation.source_entity === entity) {
+                return {
+                    field_name: relation.source_field,
+                    relation_type: relation.type.endsWith('one') ? 'one' : 'many'
+                }
+            } else {
+                return {
+                    field_name: relation.target_field,
+                    relation_type: relation.type.startsWith('one') ? 'one' : 'many'
+                }
+            }
+        })
+    })
+
+    // console.log('reldata', reldata)
+    // console.log('relationData', relationData)
     let relations2: Record<string, Record<string, boolean>> = {}
     Object.keys(relations).forEach((key) => {
         relations2[key] = {}
@@ -226,7 +255,8 @@ export function setGeneratedInfo(schema: SchemaJson): SchemaJson {
 
     Object.keys(schema.collections).forEach((collection: string) => {
         schema.collections[collection].generatedInfo = {
-            relations: relations2[collection] || {},
+            selectRelations: relations2[collection] || {},
+            relationData: relationData[collection] || [],
             from: ''
         }
     })
