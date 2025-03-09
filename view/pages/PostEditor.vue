@@ -2,15 +2,15 @@
     <AdminDashboard>
         <h1>Editor</h1>
         {{ route.params }}
-        {{ config?.schema?.collections?.[route.params.collection] }}
+        {{ (config as any)?.schema?.collections?.[route.params.collection as any] }}
         <div
             class="p-4"
-            v-if="config?.schema?.collections?.[route.params.collection]">
+            v-if="(config as any)?.schema?.collections?.[route.params.collection as any]">
             <form
                 class="space-y-4"
                 @submit.prevent="handleSubmit">
                 <div
-                    v-for="(field, fieldName) in config.schema.collections[route.params.collection]
+                    v-for="(field, fieldName) in (config as any)?.schema?.collections?.[route.params.collection as any]
                         .fields"
                     :key="fieldName"
                     class="flex flex-col">
@@ -28,7 +28,7 @@
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
                 </div>
                 <div
-                    v-for="relation in config.schema.collections[route.params.collection]
+                    v-for="relation in (config as any).schema.collections[route.params.collection as any]
                         .generatedInfo.relationData"
                     :key="relation.self_field_name"
                     class="flex flex-col gap-2">
@@ -41,11 +41,17 @@
                             :options="relationOptions?.[relation.entity_name]?.data || []"
                             :multiple="relation.relation_type === 'many'"
                             track-by="id"
-                            label="title"
+                            :label="(config as any)?.schema?.collections?.[relation.entity_name]?.info?.defaultField"
                             :loading="relationOptions?.[relation.entity_name]?.isLoading"
                             @search-change="updateRelationOptions(relation)"
                             @open="initOptions(relation)"></multiselect>
                     </div>
+                    asd
+                    {{ relation.entity_name }}
+                    {{
+                        (config as any)?.schema?.collections?.[relation.entity_name]?.info
+                            ?.defaultField
+                    }}
                 </div>
                 <div class="flex justify-end">
                     <button
@@ -100,17 +106,54 @@ watch(data, (newData) => {
     console.log(newData)
     if (!newData) return
     formData.value = { ...newData.data }
-    console.log(config?.schema?.collections?.[route.params.collection]?.generatedInfo.relationData)
+    console.log(
+        (config as any)?.schema?.collections?.[route.params.collection as any]?.generatedInfo
+            .relationData
+    )
     config?.schema?.collections?.[route.params.collection]?.generatedInfo.relationData.forEach(
-        (relation) => {
+        (relation: any) => {
             console.log(relation)
         }
     )
     // TODO make to can save the data
 })
-
-const handleSubmit = () => {
+// {
+//     "posts": {
+//         "set": [{"id": 1}]
+//     }
+// }
+const handleSubmit = async () => {
     console.log(formData.value)
+    let query: any = { ...formData.value } // console.log(query)
+    ;(config as any).schema.collections[
+        route.params.collection as any
+    ].generatedInfo.relationData.forEach((relation: any) => {
+        console.log(relation, relation.self_field_name)
+        if (relation.relation_type === 'many') {
+            query[relation.self_field_name] = {
+                set: query[relation.self_field_name].map((item: any) => {
+                    return {
+                        id: item.id
+                    }
+                })
+            }
+        } else {
+            query[`${relation.self_field_name}Id`] = query[relation.self_field_name].id
+
+            delete query[relation.self_field_name]
+        }
+    })
+
+    console.log(query)
+    const { data } = await useAxios(
+        `/${route.params.collection}/${route.params.id}`,
+        {
+            method: 'PUT',
+            data: query
+        },
+        config.axiosInstance
+    )
+    console.log('res', data)
 }
 </script>
 
