@@ -1,6 +1,6 @@
 type TRoles = 'user' | 'admin' | '*'
 type TCollections = 'user' | 'post' | 'comment' | '*'
-type TScope = 'all' | 'own'
+type TScope = 'all' | 'own' | '*'
 
 type Combination<T extends string, U extends string = ''> = T extends `${infer F}${infer R}`
     ? Combination<R, `${U}`> | Combination<R, `${U}${F}`>
@@ -8,14 +8,13 @@ type Combination<T extends string, U extends string = ''> = T extends `${infer F
 type TCrud = 'c' | 'r' | 'u' | 'd'
 export type TCrudCombination = Exclude<Combination<'crud'>, ''> | '*'
 
-type Permission<
-    R extends string = TRoles,
-    C extends string = TCollections
-> = `${R}:${C}:${TCrudCombination}:${TScope}`
+type Permission<R extends string = TRoles, C extends string = TCollections> = `${R | '*'}:${
+    | C
+    | '*'}:${TCrudCombination}:${TScope}`
 
 type TPermissionStore<R extends string = TRoles, C extends string = TCollections> = {
-    roles: R | '*'
-    collection: C | '*'
+    roles: R
+    collection: C
     crud: Record<TCrud, boolean>
     scope: TScope
     validator?: undefined | (() => boolean)
@@ -42,20 +41,28 @@ class PermissionHandler<R extends string = TRoles, C extends string = TCollectio
         return PermissionHandler.instance as unknown as PermissionHandler<R, C>
     }
 
-    private permissionSplitter(
-        permission: Permission<R, C>
-    ): [R | '*', C | '*', TCrudCombination, TScope] {
+    private permissionSplitter(permission: Permission<R, C>): [R, C, TCrudCombination, TScope] {
         const [roles, collection, crud, scope] = permission.split(':')
-        return [
-            roles as R | '*',
-            collection as C | '*',
-            crud == '*' ? 'crud' : (crud as TCrudCombination),
-            scope as TScope
-        ]
+        return [roles as R, collection as C, crud as TCrudCombination, scope as TScope]
     }
+    public addPermissionShort(
+        permissions: Permission<R, C>,
+        validator?: undefined | (() => boolean)
+    ) {
+        const [roles, collection, crud, scope] = this.permissionSplitter(permissions)
+        this.addPermission(roles, collection, crud, scope, validator)
+    }
+    public addPermission(
+        roles: R,
+        collection: C,
+        crud: TCrudCombination,
+        scope: TScope,
+        validator?: undefined | (() => boolean)
+    ) {
+        if (crud == '*') {
+            crud = 'crud'
+        }
 
-    public addPermission(permission: Permission<R, C>, validator?: undefined | (() => boolean)) {
-        const [roles, collection, crud, scope] = this.permissionSplitter(permission)
         const crudArray = crud.split('')
         const crudRes = ['c', 'r', 'u', 'd'].reduce(
             (acc, curr) => ({
@@ -81,14 +88,29 @@ class PermissionHandler<R extends string = TRoles, C extends string = TCollectio
     }
 
     private crudSatisfies(a: Record<TCrud, boolean>, b: TCrudCombination): boolean {
+        if (b == '*') return true
         const bArray = b.split('')
+        bArray.every((b) => {
+            //@ts-ignore
+            // console.log(a, b, a[b])
+            //@ts-ignore
+            return Boolean(a[b])
+        })
         //@ts-ignore
         return bArray.every((b) => Boolean(a[b]))
     }
-
-    public hasPermission(permission: Permission<R, C>): boolean {
+    public hasPermissionShort(permission: Permission<R, C>): boolean {
         const [roles, collection, crud, scope] = this.permissionSplitter(permission)
+        return this.hasPermission(roles, collection, crud, scope)
+    }
+    public hasPermission(roles: R, collection: C, crud: TCrudCombination, scope: TScope): boolean {
         for (const perm of this.permissions) {
+            console.log(
+                this.equalsOrProvided(perm.roles, roles),
+                this.equalsOrProvided(perm.collection, collection),
+                this.crudSatisfies(perm.crud, crud),
+                this.equalsOrProvided(perm.scope, scope)
+            )
             if (
                 this.equalsOrProvided(perm.roles, roles) &&
                 this.equalsOrProvided(perm.collection, collection) &&
@@ -103,8 +125,10 @@ class PermissionHandler<R extends string = TRoles, C extends string = TCollectio
 }
 
 export const permissionHandler = PermissionHandler.getInstance<
-    'user' | 'admin',
+    'asd' | 'admin',
     'post' | 'comment' | 'user'
 >()
-permissionHandler.addPermission('admin:post:c:all', () => true)
-console.log(permissionHandler.hasPermission('user:*:*:all'))
+permissionHandler.addPermission('asd', 'user', 'd', 'own', () => true)
+console.log(permissionHandler.hasPermission('asd', 'user', 'd', 'own'))
+permissionHandler.addPermissionShort('asd:post:*:*', () => true)
+console.log(permissionHandler.hasPermissionShort('asd:post:crud:*'))
