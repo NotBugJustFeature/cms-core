@@ -63,14 +63,20 @@
                         <Icon
                             icon="mdi:account"
                             class="text-xl text-gray-600 shrink-0" />
-                        <span
-                            class="ml-3 transition-all duration-300 overflow-hidden whitespace-nowrap"
+                        <div
+                            class="ml-3 flex transition-all duration-300 overflow-hidden whitespace-nowrap w-full"
                             :style="{
                                 maxWidth: isExpanded ? '150px' : '0',
                                 opacity: isExpanded ? '1' : '0'
                             }">
-                            John Doe
-                        </span>
+                            <div>
+                                {{ userStore.$state?.user?.name }}
+                            </div>
+                            <Icon
+                                icon="mdi:logout"
+                                class="text-xl text-gray-600 shrink-0 ml-auto"
+                                @click="userStore.logout()" />
+                        </div>
                     </div>
                 </button>
             </div>
@@ -86,7 +92,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import { useUserStore } from '../view/store/userStore'
 
+const userStore = useUserStore()
 const isExpanded = ref(false)
 
 const menuItems = [

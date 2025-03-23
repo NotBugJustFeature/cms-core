@@ -3,6 +3,9 @@ import { prisma } from './prisma'
 import { Prisma } from '@prisma/client'
 import { loadSchema } from './utils/schemaHandler'
 import { SchemaJson } from './types/zod'
+import { hash, compare } from 'bcrypt'
+import { getCookie, getSignedCookie, setCookie, setSignedCookie, deleteCookie } from 'hono/cookie'
+import { decode, sign, verify } from 'hono/jwt'
 
 let schema: SchemaJson = loadSchema('schema_res.json')
 
@@ -10,6 +13,10 @@ console.log(schema)
 export const apiApp = new Hono()
 
 Object.keys(schema.collections).forEach((collection: String) => {
+    //@ts-ignore
+    // console.log(schema.collections[collection].info.disabledEndpoints)
+    //@ts-ignore
+    // if (!schema.collections[collection].info.disabledEndpoints.readAll)
     apiApp.get(`/${collection}`, async (context) => {
         return context.json({
             data:
@@ -154,6 +161,73 @@ apiApp.get('/asd', async (context) => {
 // TODO - add auth
 // TODO - add validation
 // TODO - add error handling
-// TODO - add logging
+// TODO - add loggings
 // TODO - add metrics
 // TODO - add openapi
+
+apiApp.post('/login', async (context) => {
+    const { username, password } = await context.req.json()
+    // console.log(username, password)
+    if (!username || !password)
+        return context.json({ error: 'Username and password are required' }, 400)
+    const user = await prisma.user.findFirst({
+        where: {
+            name: username
+        }
+    })
+    // console.log(user)
+    if (!user) return context.json({ error: 'User not found' }, 404)
+    if (!(await compare(password, user.password as string)))
+        return context.json({ error: 'Invalid password' }, 401)
+
+    const token = await sign({ id: user.id }, process.env.JWT_SECRET || 'changeme')
+    setCookie(context, 'token', token)
+    return context.json(user)
+})
+
+apiApp.post('/register', async (context) => {
+    const { username, password } = await context.req.json()
+    const existingUsers = await prisma.user.count()
+    // console.log(existingUsers)
+    if (existingUsers > 0) {
+        return context.json({ error: 'Registration is disabled' }, 403)
+    }
+    if (!username || !password)
+        return context.json({ error: 'Username and password are required' }, 400)
+    const isUser = await prisma.user.findFirst({
+        where: {
+            name: username
+        }
+    })
+    if (isUser) return context.json({ error: 'User already exists' }, 400)
+    const hashedPassword = await hash(password, 10)
+    const user = await prisma.user.create({
+        data: { name: username, password: hashedPassword }
+    })
+    return context.json(user)
+})
+
+apiApp.get('/is_init_mode', async (context) => {
+    return context.json({ isInitMode: false })
+    const existingUsers = await prisma.user.count()
+
+    return context.json({ isInitMode: existingUsers == 0 })
+})
+
+apiApp.get('/logout', async (context) => {
+    deleteCookie(context, 'token')
+    return context.json({})
+})
+
+apiApp.get('/is_authenticated', async (context) => {
+    const token = getCookie(context, 'token')
+    if (!token) return context.json({ isAuthenticated: false })
+    const decoded = await verify(token, process.env.JWT_SECRET || 'changeme')
+    const user = await prisma.user.findFirst({
+        where: {
+            id: decoded.id as number
+        }
+    })
+    if (!user) return context.json({ isAuthenticated: false })
+    return context.json({ isAuthenticated: true, user: user })
+})

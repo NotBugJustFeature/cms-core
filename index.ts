@@ -16,6 +16,11 @@ export default {
             path: '/collection/:collection/:id',
             name: 'collection-edit',
             component: () => import('./view/pages/PostEditor.vue')
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: () => import('./view/pages/Login.vue')
         }
     ],
     title: 'core',

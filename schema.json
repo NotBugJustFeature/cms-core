@@ -20,7 +20,14 @@
                 }
             },
             "info": {
-                "defaultField": "name"
+                "defaultField": "name",
+                "disabledEndpoints": {
+                    "create": false,
+                    "update": false,
+                    "delete": false,
+                    "read": false,
+                    "readAll": true
+                }
             }
         },
         "Post": {
@@ -35,7 +42,14 @@
                 }
             },
             "info": {
-                "defaultField": "title"
+                "defaultField": "title",
+                "disabledEndpoints": {
+                    "create": false,
+                    "update": false,
+                    "delete": false,
+                    "read": false,
+                    "readAll": false
+                }
             }
         }
     },
