@@ -21,6 +21,11 @@ export default {
             path: '/login',
             name: 'login',
             component: () => import('./view/pages/Login.vue')
+        },
+        {
+            path: '/schema-builder',
+            name: 'schema-builder',
+            component: () => import('./view/pages/SchemaBuilder.vue')
         }
     ],
     title: 'core',
