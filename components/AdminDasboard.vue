@@ -83,7 +83,7 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="flex-1 overflow-auto">
+        <div :class="['flex-1 overflow-auto', slotClass]">
             <slot />
         </div>
     </div>
@@ -96,6 +96,10 @@ import { useUserStore } from '../view/store/userStore'
 
 const userStore = useUserStore()
 const isExpanded = ref(false)
+
+defineProps<{
+    slotClass?: string
+}>()
 
 const menuItems = [
     { name: 'Dashboard', path: '/collection', icon: 'mdi:view-dashboard' },

@@ -1,9 +1,15 @@
 <template>
-    <AdminDashboard>
-        <h1>Listing</h1>
+    <AdminDashboard slot-class="p-4 flex flex-col gap-4">
+        <a :href="`/`">Back to dashboard</a>
+        <h1>{{ route.params.collection }} collection</h1>
+        <a
+            :href="`/collection/${route.params.collection}/new`"
+            class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-indigo-200 w-fit">
+            Add new
+        </a>
         <!-- {{ route.params }} -->
         <!-- {{ config.apiUrl }} -->
-        {{ config.schema.collections }}
+        <!-- {{ config.schema.collections }} -->
         <div v-if="config?.schema?.collections?.[route.params.collection]">
             <!-- {{ data }} -->
             <div class="bg-white shadow-md overflow-hidden">
@@ -35,6 +41,7 @@
                                         Edit
                                     </router-link>
                                     <button
+                                        @click="deleteItem(item.id)"
                                         class="bg-red-600 text-red-100 px-3 py-1 rounded-md text-sm font-medium hover:bg-red-500">
                                         Delete
                                     </button>
@@ -56,7 +63,14 @@ import { ref, onMounted } from 'vue'
 import { useAxios } from '@vueuse/integrations'
 const route = useRoute()
 
-const { data } = useAxios(`${route.params.collection}`, config.axiosInstance)
+const { data, execute: refetchData } = useAxios(`${route.params.collection}`, config.axiosInstance)
+
+const deleteItem = async (id: string) => {
+    if (confirm('Are you sure you want to delete this item?')) {
+        await config.axiosInstance.delete(`${route.params.collection}/${id}`)
+        refetchData()
+    }
+}
 </script>
 
 <style scoped>

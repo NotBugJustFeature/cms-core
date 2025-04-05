@@ -1,11 +1,9 @@
 <template>
-    <AdminDashboard>
-        <h1>Editor</h1>
-        {{ route.params }}
-        {{ (config as any)?.schema?.collections?.[route.params.collection as any] }}
-        <div
-            class="p-4"
-            v-if="(config as any)?.schema?.collections?.[route.params.collection as any]">
+    <AdminDashboard slot-class="p-4 flex flex-col gap-4">
+        <a :href="`/collection/${route.params.collection}`">Back to listing</a>
+        <h1>{{ isNewPost ? 'Add new' : `Edit ${route.params.collection} (${data.data.id})` }}</h1>
+
+        <div v-if="(config as any)?.schema?.collections?.[route.params.collection as any]">
             <form
                 class="space-y-4"
                 @submit.prevent="handleSubmit">
@@ -25,7 +23,7 @@
                         :name="fieldName.toString()"
                         v-model="formData[fieldName]"
                         type="text"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" />
                 </div>
                 <div
                     v-for="relation in (config as any).schema.collections[route.params.collection as any]
@@ -46,18 +44,12 @@
                             @search-change="updateRelationOptions(relation)"
                             @open="initOptions(relation)"></multiselect>
                     </div>
-                    asd
-                    {{ relation.entity_name }}
-                    {{
-                        (config as any)?.schema?.collections?.[relation.entity_name]?.info
-                            ?.defaultField
-                    }}
                 </div>
                 <div class="flex justify-end">
                     <button
                         type="submit"
                         class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        Save
+                        {{ isNewPost ? 'Create' : 'Save' }}
                     </button>
                 </div>
             </form>
@@ -69,18 +61,23 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import config from '@config'
 import AdminDashboard from '@cms/cms-core/components/AdminDasboard.vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAxios } from '@vueuse/integrations'
 import Multiselect from 'vue-multiselect'
 
 const route = useRoute()
+const router = useRouter()
 const formData = ref({})
 const relationOptions = ref<any>({})
 
-const { data } = useAxios(`${route.params.collection}/${route.params.id}`, config.axiosInstance)
+const isNewPost = computed(() => route.params.id === 'new')
+
+const { data } = !isNewPost.value
+    ? useAxios(`${route.params.collection}/${route.params.id}`, config.axiosInstance)
+    : { data: ref(null) }
 
 const updateRelationOptions = async (relation: any) => {
     if (!relationOptions.value[relation.entity_name]) {
@@ -91,7 +88,6 @@ const updateRelationOptions = async (relation: any) => {
     }
     relationOptions.value[relation.entity_name].isLoading = true
     const { data } = await useAxios(`/${relation.entity_name}`, config.axiosInstance)
-    console.log(data?.value?.data)
     relationOptions.value[relation.entity_name].data = data?.value?.data
     relationOptions.value[relation.entity_name].isLoading = false
 }
@@ -103,57 +99,56 @@ const initOptions = (relation: any) => {
 }
 
 watch(data, (newData) => {
-    console.log(newData)
     if (!newData) return
     formData.value = { ...newData.data }
-    console.log(
-        (config as any)?.schema?.collections?.[route.params.collection as any]?.generatedInfo
-            .relationData
-    )
-    config?.schema?.collections?.[route.params.collection]?.generatedInfo.relationData.forEach(
-        (relation: any) => {
-            console.log(relation)
-        }
-    )
-    // TODO make to can save the data
 })
-// {
-//     "posts": {
-//         "set": [{"id": 1}]
-//     }
-// }
+
 const handleSubmit = async () => {
-    console.log(formData.value)
-    let query: any = { ...formData.value } // console.log(query)
+    let query: any = { ...formData.value }
+
+    // Handle relations
     ;(config as any).schema.collections[
         route.params.collection as any
     ].generatedInfo.relationData.forEach((relation: any) => {
-        console.log(relation, relation.self_field_name)
+        if (!query[relation.self_field_name]) return
+
         if (relation.relation_type === 'many') {
             query[relation.self_field_name] = {
-                set: query[relation.self_field_name].map((item: any) => {
-                    return {
-                        id: item.id
-                    }
-                })
+                set: query[relation.self_field_name].map((item: any) => ({
+                    id: item.id
+                }))
             }
         } else {
             query[`${relation.self_field_name}Id`] = query[relation.self_field_name].id
-
             delete query[relation.self_field_name]
         }
     })
 
-    console.log(query)
-    const { data } = await useAxios(
-        `/${route.params.collection}/${route.params.id}`,
-        {
-            method: 'PUT',
-            data: query
-        },
-        config.axiosInstance
-    )
-    console.log('res', data)
+    try {
+        if (isNewPost.value) {
+            const { data } = await useAxios(
+                `/${route.params.collection}`,
+                {
+                    method: 'POST',
+                    data: query
+                },
+                config.axiosInstance
+            )
+            // Redirect to edit page after creation
+            router.push(`/collection/${route.params.collection}/${data.value.data.id}`)
+        } else {
+            const { data } = await useAxios(
+                `/${route.params.collection}/${route.params.id}`,
+                {
+                    method: 'PUT',
+                    data: query
+                },
+                config.axiosInstance
+            )
+        }
+    } catch (error) {
+        console.error('Error saving data:', error)
+    }
 }
 </script>
 

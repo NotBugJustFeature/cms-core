@@ -10,26 +10,35 @@ export const useUserStore = defineStore('user', {
     state: () => ({
         user: null as any,
         token: null as string | null,
-        isAuthenticated: false
+        isAuthenticated: false,
+        errorMessage: String | undefined
     }),
 
     actions: {
         async login(credentials: { username: string; password: string }) {
-            try {
-                const { data } = await useAxios(
-                    '/login',
-                    {
-                        method: 'POST',
-                        data: credentials
-                    },
-                    config.axiosInstance
-                )
-                console.log(data)
-                return true
-            } catch (error) {
-                console.error('Login error:', error)
+            // try {
+            const { data } = await useAxios(
+                '/login',
+                {
+                    method: 'POST',
+                    data: credentials
+                },
+                config.axiosInstance
+            )
+            console.log('login response', data.value)
+            this.errorMessage = data.value?.error
+            // console.log(data)
+            if (data.value?.error) {
                 return false
+            } else {
+                this.errorMessage = undefined
             }
+            return true
+
+            // } catch (error) {
+            //     console.error('Login error:', error)
+            //     return false
+            // }
         },
 
         async logout() {

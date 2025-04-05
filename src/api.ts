@@ -168,17 +168,16 @@ apiApp.get('/asd', async (context) => {
 apiApp.post('/login', async (context) => {
     const { username, password } = await context.req.json()
     // console.log(username, password)
-    if (!username || !password)
-        return context.json({ error: 'Username and password are required' }, 400)
+    if (!username || !password) return context.json({ error: 'Username and password are required' })
     const user = await prisma.user.findFirst({
         where: {
             name: username
         }
     })
     // console.log(user)
-    if (!user) return context.json({ error: 'User not found' }, 404)
+    if (!user) return context.json({ error: 'User not found' })
     if (!(await compare(password, user.password as string)))
-        return context.json({ error: 'Invalid password' }, 401)
+        return context.json({ error: 'Invalid password' })
 
     const token = await sign({ id: user.id }, process.env.JWT_SECRET || 'changeme')
     setCookie(context, 'token', token)
@@ -190,16 +189,15 @@ apiApp.post('/register', async (context) => {
     const existingUsers = await prisma.user.count()
     // console.log(existingUsers)
     if (existingUsers > 0) {
-        return context.json({ error: 'Registration is disabled' }, 403)
+        return context.json({ error: 'Registration is disabled' })
     }
-    if (!username || !password)
-        return context.json({ error: 'Username and password are required' }, 400)
+    if (!username || !password) return context.json({ error: 'Username and password are required' })
     const isUser = await prisma.user.findFirst({
         where: {
             name: username
         }
     })
-    if (isUser) return context.json({ error: 'User already exists' }, 400)
+    if (isUser) return context.json({ error: 'User already exists' })
     const hashedPassword = await hash(password, 10)
     const user = await prisma.user.create({
         data: { name: username, password: hashedPassword }

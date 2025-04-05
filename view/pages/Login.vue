@@ -46,11 +46,11 @@
                                 class="w-full"
                                 toggleMask />
                             <Message
-                                v-if="$form.password?.invalid"
+                                v-if="userStore.errorMessage"
                                 severity="error"
                                 size="small"
                                 variant="simple">
-                                {{ $form.password.error?.message }}
+                                {{ userStore.errorMessage }}
                             </Message>
                         </div>
                     </div>
@@ -93,8 +93,14 @@ const formData = ref({
 })
 
 const onFormSubmit = async (e: any) => {
-    if (isInitMode.value ? userStore.register(formData.value) : userStore.login(formData.value)) {
+    router.push('/')
+    if (
+        isInitMode.value
+            ? await userStore.register(formData.value)
+            : await userStore.login(formData.value)
+    ) {
         await router.push('/')
+        // router.push('/')
     }
 }
 </script>
