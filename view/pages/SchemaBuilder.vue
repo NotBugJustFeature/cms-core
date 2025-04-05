@@ -2,9 +2,36 @@
     <AdminDashboard slot-class="p-4">
         <h1>Schema Builder</h1>
         <div class="flex gap-2 my-4">
-            <button class="bg-blue-500 text-white px-4 py-1 rounded">Save</button>
-            <button class="bg-blue-500 text-white px-4 py-1 rounded">Load</button>
+            <button
+                class="bg-blue-500 text-white px-4 py-1 rounded"
+                @click="isModalOpen = true">
+                Show JSON
+            </button>
         </div>
+        <Teleport to="body">
+            <div
+                v-if="isModalOpen"
+                class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center p-4">
+                <div class="bg-white p-4 rounded w-full flex flex-col gap-2 h-full max-w-4xl">
+                    <textarea
+                        ref="jsonModal"
+                        class="w-full h-full p-4 rounded"
+                        :value="JSON.stringify(schema, null, 2)" />
+                    <div class="flex gap-2">
+                        <button
+                            class="bg-blue-500 text-white px-4 py-1 rounded"
+                            @click="isModalOpen = false">
+                            Close
+                        </button>
+                        <button
+                            class="bg-blue-500 text-white px-4 py-1 rounded"
+                            @click="saveJson">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
         <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-4 p-4 border rounded">
                 <h2 class="text-xl">Info</h2>
@@ -193,6 +220,7 @@
                     </button>
                 </div>
             </div>
+            <Toast />
         </div>
     </AdminDashboard>
 </template>
@@ -205,6 +233,12 @@ import SchemaBuilderElement from '@cms/cms-core/components/SchemaBuilderElement.
 import { useSortable } from '@vueuse/integrations/useSortable'
 import { SchemaJson } from '@cms/cms-core/src/types/zod'
 import { Icon } from '@iconify/vue'
+import { useToast } from 'primevue/usetoast'
+import Toast from 'primevue/toast'
+const toast = useToast()
+
+const isModalOpen = ref(false)
+const jsonModal = ref<HTMLTextAreaElement | null>(null)
 
 const schema = ref<SchemaJson>({
     info: {
@@ -289,5 +323,22 @@ const addRelation = () => {
 
 const removeRelation = (index: number) => {
     schema.value.relations.splice(index, 1)
+}
+
+const saveJson = () => {
+    console.log(jsonModal.value?.value)
+    try {
+        const json = JSON.parse(jsonModal.value?.value || '{}')
+        if (json) {
+            console.log(json)
+            schema.value = json
+            toast.add({ severity: 'success', summary: 'Success', detail: 'JSON saved', life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Invalid JSON', life: 3000 })
+        }
+    } catch (error) {
+        console.error('asd')
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Invalid JSON', life: 3000 })
+    }
 }
 </script>
