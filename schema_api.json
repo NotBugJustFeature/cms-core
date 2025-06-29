@@ -6,18 +6,32 @@
         "slug": "prisma-cms-api",
         "type": "api"
     },
-    "collections": {},
+    "collections": {
+        "user": {
+            "fields": {
+                "name": { "type": "String" },
+                "email": { "type": "String" },
+                "password": { "type": "String" }
+            }
+        },
+        "post": {
+            "fields": { "title": { "type": "String" }, "content": { "type": "String" } },
+            "info": {
+                "default_field": "title"
+            }
+        }
+    },
     "relations": [
         {
             "source_entity": "user",
-            "source_field": "products",
-            "target_entity": "product",
-            "target_field": "user",
+            "source_field": "posts",
+            "target_entity": "post",
+            "target_field": "createdBy",
             "type": "one-to-many"
         }
     ],
     "extends": {
-        "product": {
+        "post": {
             "fields": {
                 "rating": {
                     "type": "Int"

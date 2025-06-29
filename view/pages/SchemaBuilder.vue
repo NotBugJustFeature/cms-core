@@ -98,16 +98,19 @@
                             @change="updateCollectionName(name, $event.target.value)"
                             placeholder="Collection Name"
                             class="border p-2 rounded" />
-                        <select
-                            v-model="collection.info.defaultField"
-                            class="border p-2 rounded">
-                            <option
-                                v-for="(field, fieldName) in collection.fields"
-                                :key="fieldName"
-                                :value="fieldName">
-                                {{ fieldName }}
-                            </option>
-                        </select>
+                        <div>
+                            <label class="pr-4">Default Field:</label>
+                            <select
+                                v-model="collection.info.defaultField"
+                                class="border p-2 rounded">
+                                <option
+                                    v-for="(field, fieldName) in collection.fields"
+                                    :key="fieldName"
+                                    :value="fieldName">
+                                    {{ fieldName }}
+                                </option>
+                            </select>
+                        </div>
                         <button
                             @click="removeCollection(name)"
                             class="text-red-500">

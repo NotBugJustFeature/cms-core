@@ -37,7 +37,7 @@
                                 :icon="item.icon"
                                 class="text-xl text-gray-600 shrink-0" />
                             <span
-                                class="ml-3 transition-all duration-300 overflow-hidden"
+                                class="ml-3 transition-all duration-300 overflow-hidden text-nowrap"
                                 :style="{
                                     width: isExpanded ? 'auto' : '0',
                                     opacity: isExpanded ? '1' : '0'
@@ -102,21 +102,8 @@ defineProps<{
 }>()
 
 const menuItems = [
-    { name: 'Dashboard', path: '/collection', icon: 'mdi:view-dashboard' },
-    { name: 'Posts', path: '/posts', icon: 'mdi:post' },
-    { name: 'Media', path: '/media', icon: 'mdi:image' },
-    { name: 'Users', path: '/users', icon: 'mdi:account-group' },
-    { name: 'Settings', path: '/settings', icon: 'mdi:cog' },
-    { name: 'Dashboard', path: '/dashboard', icon: 'mdi:view-dashboard' },
-    { name: 'Posts', path: '/posts', icon: 'mdi:post' },
-    { name: 'Media', path: '/media', icon: 'mdi:image' },
-    { name: 'Users', path: '/users', icon: 'mdi:account-group' },
-    { name: 'Settings', path: '/settings', icon: 'mdi:cog' },
-    { name: 'Dashboard', path: '/dashboard', icon: 'mdi:view-dashboard' },
-    { name: 'Posts', path: '/posts', icon: 'mdi:post' },
-    { name: 'Media', path: '/media', icon: 'mdi:image' },
-    { name: 'Users', path: '/users', icon: 'mdi:account-group' },
-    { name: 'Settings', path: '/settings', icon: 'mdi:cog' }
+    { name: 'Dashboard', path: '/', icon: 'mdi:view-dashboard' },
+    { name: 'Schema Builder', path: '/schema-builder', icon: 'mdi:post' }
 ]
 
 const stats = [
