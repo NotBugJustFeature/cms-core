@@ -6,6 +6,7 @@ import { SchemaJson } from './types/zod'
 import { hash, compare } from 'bcrypt'
 import { getCookie, getSignedCookie, setCookie, setSignedCookie, deleteCookie } from 'hono/cookie'
 import { decode, sign, verify } from 'hono/jwt'
+import Permission_handler from './permission_handler'
 
 import qs from 'qs'
 
@@ -52,8 +53,6 @@ apiApp.get('/asd', async (context) => {
 // post - create
 // put/{id} - update
 // delete/{id} - delete
-// TODO - add validation
-// TODO - add error handling
 // TODO - add loggings
 // TODO - add metrics
 // TODO - add openapi
@@ -134,12 +133,15 @@ function normalizeTypes(obj: any): any {
 }
 
 Object.keys(schema.collections).forEach((collection: String) => {
-    //@ts-ignore
-    // console.log(schema.collections[collection].info.disabledEndpoints)
-    //@ts-ignore
-    // if (!schema.collections[collection].info.disabledEndpoints.readAll)
-    apiApp.get('/:collection', async (context) => {
-        const { collection } = context.req.param()
+    apiApp.get(`/${collection}`, async (context) => {
+        const allowed = await Permission_handler.check(collection as string, 'readAll', context)
+        if (
+            (!allowed && typeof allowed === 'boolean') ||
+            (typeof allowed === 'object' && allowed.allowed == false)
+        ) {
+            return context.json({ error: 'Forbidden' }, 403)
+        }
+
         const rawQuery = context.req.url.split('?')[1] || ''
         const query = qs.parse(rawQuery)
         const cmsHeader = context.req.header('X-CMS')
@@ -156,7 +158,8 @@ Object.keys(schema.collections).forEach((collection: String) => {
         try {
             // @ts-ignore
             const data = await prisma[collection].findMany({
-                ...parsedQuery
+                ...parsedQuery,
+                ...(typeof allowed === 'object' ? allowed?.queryOverride : {})
             })
 
             return context.json({ data })
@@ -167,6 +170,13 @@ Object.keys(schema.collections).forEach((collection: String) => {
     })
 
     apiApp.get(`/${collection}/:id`, async (context) => {
+        const allowed = await Permission_handler.check(collection as string, 'read', context)
+        if (
+            (!allowed && typeof allowed === 'boolean') ||
+            (typeof allowed === 'object' && allowed.allowed == false)
+        ) {
+            return context.json({ error: 'Forbidden' }, 403)
+        }
         const id = parseInt(context.req.param('id'))
         if (isNaN(id)) {
             return context.json({ error: 'Invalid id' })
@@ -191,6 +201,14 @@ Object.keys(schema.collections).forEach((collection: String) => {
     })
 
     apiApp.delete(`/${collection}/:id`, async (context) => {
+        const allowed = await Permission_handler.check(collection as string, 'delete', context)
+        if (
+            (!allowed && typeof allowed === 'boolean') ||
+            (typeof allowed === 'object' && allowed.allowed == false)
+        ) {
+            return context.json({ error: 'Forbidden' }, 403)
+        }
+
         const id = parseInt(context.req.param('id'))
         if (isNaN(id)) {
             return context.json({ error: 'Invalid id' })
@@ -211,6 +229,13 @@ Object.keys(schema.collections).forEach((collection: String) => {
     })
 
     apiApp.post(`/${collection}`, async (context) => {
+        const allowed = await Permission_handler.check(collection as string, 'create', context)
+        if (
+            (!allowed && typeof allowed === 'boolean') ||
+            (typeof allowed === 'object' && allowed.allowed == false)
+        ) {
+            return context.json({ error: 'Forbidden' }, 403)
+        }
         const data = await context.req.json()
         console.log(data)
 
@@ -233,6 +258,13 @@ Object.keys(schema.collections).forEach((collection: String) => {
     })
 
     apiApp.put(`/${collection}/:id`, async (context) => {
+        const allowed = await Permission_handler.check(collection as string, 'update', context)
+        if (
+            (!allowed && typeof allowed === 'boolean') ||
+            (typeof allowed === 'object' && allowed.allowed == false)
+        ) {
+            return context.json({ error: 'Forbidden' }, 403)
+        }
         const id = parseInt(context.req.param('id'))
         if (isNaN(id)) {
             return context.json({ error: 'Invalid id' })
