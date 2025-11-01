@@ -21,19 +21,19 @@ export const apiApp = new Hono()
 //     }
 // })
 
-apiApp.get('/asd', async (context) => {
-    await prisma.user.update({
-        where: {
-            id: 1
-        },
-        data: {
-            posts: {
-                set: [{ id: 1 }]
-            }
-        }
-    })
-    return context.json({})
-})
+// apiApp.get('/asd', async (context) => {
+//     await prisma.user.update({
+//         where: {
+//             id: 1
+//         },
+//         data: {
+//             posts: {
+//                 set: [{ id: 1 }]
+//             }
+//         }
+//     })
+//     return context.json({})
+// })
 
 // apiApp.get('/:collection', async (context) => {
 //     const { collection } = context.req.param()
