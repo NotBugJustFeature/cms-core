@@ -17,6 +17,9 @@
                 },
                 "password": {
                     "type": "Text"
+                },
+                "isAdmin": {
+                    "type": "Boolean"
                 }
             },
             "info": {
