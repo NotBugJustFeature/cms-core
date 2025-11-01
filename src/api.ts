@@ -124,11 +124,19 @@ apiApp.get('/is_authenticated', async (context) => {
 
 function normalizeTypes(obj: any): any {
     if (Array.isArray(obj)) return obj.map(normalizeTypes)
+
     if (obj && typeof obj === 'object') {
         return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, normalizeTypes(v)]))
     }
+
     if (obj === 'true') return true
     if (obj === 'false') return false
+
+    // Convert numeric strings to numbers
+    if (!isNaN(obj) && obj !== null && obj !== '') {
+        return Number(obj)
+    }
+
     return obj
 }
 
@@ -156,10 +164,21 @@ Object.keys(schema.collections).forEach((collection: String) => {
         }
 
         try {
+            let mergedWhere = parsedQuery.where || {}
+
+            if (typeof allowed === 'object' && allowed.queryOverride?.where) {
+                // Mindkettő létezik → merge AND feltétellel
+                if (Object.keys(mergedWhere).length > 0) {
+                    mergedWhere = { AND: [mergedWhere, allowed.queryOverride.where] }
+                } else {
+                    mergedWhere = allowed.queryOverride.where
+                }
+            }
+
             // @ts-ignore
             const data = await prisma[collection].findMany({
                 ...parsedQuery,
-                ...(typeof allowed === 'object' ? allowed?.queryOverride : {})
+                where: mergedWhere
             })
 
             return context.json({ data })
