@@ -166,12 +166,12 @@ Object.keys(schema.collections).forEach((collection: String) => {
         try {
             let mergedWhere = parsedQuery.where || {}
 
-            if (typeof allowed === 'object' && allowed.queryOverride?.where) {
+            if (typeof allowed === 'object' && allowed.queryOverride) {
                 // Mindkettő létezik → merge AND feltétellel
                 if (Object.keys(mergedWhere).length > 0) {
-                    mergedWhere = { AND: [mergedWhere, allowed.queryOverride.where] }
+                    mergedWhere = { AND: [mergedWhere, allowed.queryOverride] }
                 } else {
-                    mergedWhere = allowed.queryOverride.where
+                    mergedWhere = allowed.queryOverride
                 }
             }
 
